@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Archives (don't commit the zip, only source)
+*.zip
+*.tar.gz
+
+# Editor
+.vscode/
+.idea/
+
+# Node (if you ever add a build step)
+node_modules/

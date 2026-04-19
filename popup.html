@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>YT Focus Filter</title>
+<style>
+  /* ── Reset & tokens ───────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0d0d0d;
+    --surface:  #161616;
+    --border:   #2a2a2a;
+    --accent:   #e8ff47;      /* sharp lemon-yellow */
+    --danger:   #ff4d4d;
+    --safe:     #47ffa3;
+    --text:     #e8e8e8;
+    --muted:    #666;
+    --radius:   6px;
+    --font:     'DM Mono', 'Courier New', monospace;
+  }
+
+  body {
+    width: 320px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 16px;
+    user-select: none;
+  }
+
+  /* ── Header ───────────────────────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 4px;
+    display: grid; place-items: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  h1 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .subtitle {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Section labels ───────────────────────────────────────────── */
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  section { margin-bottom: 14px; }
+
+  /* ── Mode selector ────────────────────────────────────────────── */
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .mode-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 7px 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    letter-spacing: 0.04em;
+  }
+
+  .mode-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  .mode-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0d0d0d;
+    font-weight: 700;
+  }
+
+  /* ── Keyword inputs ───────────────────────────────────────────── */
+  .input-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .input-row input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 6px 8px;
+    outline: none;
+    transition: border-color .15s;
+  }
+
+  .input-row input::placeholder { color: var(--muted); }
+  .input-row input:focus { border-color: var(--accent); }
+
+  .add-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    width: 30px;
+    cursor: pointer;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+
+  .add-btn.block-btn:hover  { border-color: var(--danger); color: var(--danger); }
+  .add-btn.allow-btn:hover  { border-color: var(--safe);   color: var(--safe); }
+
+  /* ── Tag chips ────────────────────────────────────────────────── */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+    min-height: 24px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 4px;
+    padding: 3px 7px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    cursor: default;
+  }
+
+  .tag.block   { background: rgba(255,77,77,.15);  border: 1px solid rgba(255,77,77,.35);  color: var(--danger); }
+  .tag.allow   { background: rgba(71,255,163,.12); border: 1px solid rgba(71,255,163,.3);  color: var(--safe); }
+  .tag.channel { background: rgba(232,255,71,.10); border: 1px solid rgba(232,255,71,.3);  color: var(--accent); }
+
+  .tag-remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 11px;
+    opacity: .6;
+    padding: 0;
+    line-height: 1;
+    font-family: var(--font);
+  }
+  .tag-remove:hover { opacity: 1; }
+
+  /* ── Save button ──────────────────────────────────────────────── */
+  #save-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #0d0d0d;
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 9px;
+    cursor: pointer;
+    transition: opacity .15s;
+    margin-top: 4px;
+  }
+
+  #save-btn:hover   { opacity: .85; }
+  #save-btn:active  { opacity: .7; }
+
+  /* ── Toast ────────────────────────────────────────────────────── */
+  #toast {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--safe);
+    height: 16px;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  #toast.show { opacity: 1; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">▶</div>
+  <div>
+    <h1>YT Focus Filter</h1>
+    <div class="subtitle">mode-based video blocker</div>
+  </div>
+</header>
+
+<!-- Mode -->
+<section>
+  <div class="label">Active Mode</div>
+  <div class="mode-grid">
+    <button class="mode-btn" data-mode="study">Study</button>
+    <button class="mode-btn" data-mode="deep">Deep Focus</button>
+    <button class="mode-btn" data-mode="off">Off</button>
+  </div>
+</section>
+
+<hr />
+
+<!-- Block keywords -->
+<section>
+  <div class="label">Block keywords</div>
+  <div class="input-row">
+    <input id="block-input" type="text" placeholder="e.g. reaction" />
+    <button class="add-btn block-btn" id="add-block" title="Add blocked keyword">+</button>
+  </div>
+  <div class="tag-list" id="block-tags"></div>
+</section>
+
+<!-- Allow keywords -->
+<section>
+  <div class="label">Allow keywords (override block)</div>
+  <div class="input-row">
+    <input id="allow-input" type="text" placeholder="e.g. tutorial" />
+    <button class="add-btn allow-btn" id="add-allow" title="Add allowed keyword">+</button>
+  </div>
+  <div class="tag-list" id="allow-tags"></div>
+</section>
+
+<!-- Blocked channels -->
+<hr />
+<section>
+  <div class="label">Blocked channels</div>
+  <div class="input-row">
+    <input id="channel-input" type="text" placeholder="e.g. mrbeast" />
+    <button class="add-btn" id="add-channel" style="font-size:14px" title="Block channel">+</button>
+  </div>
+  <div class="tag-list" id="channel-list"></div>
+</section>
+
+<button id="save-btn">Save &amp; Apply</button>
+<div id="toast">✓ Saved</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
