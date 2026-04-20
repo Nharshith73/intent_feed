@@ -1,13 +1,10 @@
-<<<<<<< HEAD
 =======
 # intent_feed
 intent_feed is a browser extension that transforms your content feed based on user intent—prioritizing meaningful, goal-oriented content while filtering out
->>>>>>> 810aedda42c7907e88d3e4c5e2ca0c88a2093c45
 # YT Focus Filter
 
 A Chrome extension that filters YouTube videos by keyword so you only see what you actually came for.
 
-![popup preview](https://i.imgur.com/placeholder.png)
 
 ---
 
